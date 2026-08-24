@@ -1,0 +1,128 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta
+      name="description"
+      content="HandoverGuard policy-bound hotel operations agent demo"
+    />
+    <title>HandoverGuard — Night shift control</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Manrope:wght@400;500;600;700;800&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="/static/styles.css" />
+    <script src="/static/app.js" defer></script>
+  </head>
+  <body>
+    <div class="ambient ambient-one"></div>
+    <div class="ambient ambient-two"></div>
+
+    <header class="topbar">
+      <a class="brand" href="/" aria-label="HandoverGuard home">
+        <span class="brand-mark" aria-hidden="true"><span></span></span>
+        <span>HandoverGuard</span>
+      </a>
+      <div class="topbar-meta">
+        <span class="status-dot"></span>
+        <span>Policy engine online</span>
+        <span class="divider"></span>
+        <span class="mono">SYNTHETIC DATA</span>
+      </div>
+    </header>
+
+    <main>
+      <section class="hero">
+        <div>
+          <p class="eyebrow">RIYADH DEMO PROPERTY · NIGHT OPERATIONS</p>
+          <h1>The next shift inherits <em>decisions</em>, not noise.</h1>
+          <p class="hero-copy">
+            A Strands agent that turns messy hotel handovers into safe action—then pauses
+            exactly where human judgment begins.
+          </p>
+        </div>
+        <div class="hero-actions">
+          <button class="button button-primary" id="run-button">
+            <span class="button-icon">▶</span>
+            Run the handover agent
+          </button>
+          <button class="button button-secondary" id="reset-button">Reset scenario</button>
+        </div>
+      </section>
+
+      <section class="trust-strip" aria-label="Agent boundaries">
+        <div><strong>Routine work</strong><span>Executed autonomously</span></div>
+        <div><strong>Sensitive actions</strong><span>Held for approval</span></div>
+        <div><strong>Every change</strong><span>Hash-chain audited</span></div>
+      </section>
+
+      <section class="metrics" aria-label="Shift metrics">
+        <article class="metric">
+          <div class="metric-label">Open decisions</div>
+          <div class="metric-value" id="unresolved-count">—</div>
+          <div class="metric-foot">Canonical issues</div>
+        </article>
+        <article class="metric metric-green">
+          <div class="metric-label">Safe actions</div>
+          <div class="metric-value" id="task-count">—</div>
+          <div class="metric-foot">Created without interruption</div>
+        </article>
+        <article class="metric metric-amber">
+          <div class="metric-label">Human checkpoints</div>
+          <div class="metric-value" id="approval-count">—</div>
+          <div class="metric-foot">No silent high-risk action</div>
+        </article>
+        <article class="metric metric-blue">
+          <div class="metric-label">Audit integrity</div>
+          <div class="metric-value metric-word" id="audit-status">—</div>
+          <div class="metric-foot" id="audit-count">Waiting for events</div>
+        </article>
+      </section>
+
+      <section class="workspace-grid">
+        <article class="panel operations-panel">
+          <div class="panel-heading">
+            <div>
+              <p class="eyebrow">LIVE WORK QUEUE</p>
+              <h2>Shift handover</h2>
+            </div>
+            <div class="shift-chip mono">SHIFT-NIGHT-2408</div>
+          </div>
+          <div class="issue-list" id="issue-list">
+            <div class="empty-state">Loading the synthetic shift…</div>
+          </div>
+        </article>
+
+        <aside class="panel agent-panel">
+          <div class="agent-heading">
+            <div class="agent-orbit"><span></span></div>
+            <div>
+              <p class="eyebrow">AGENT ACTIVITY</p>
+              <h2>What happened</h2>
+            </div>
+          </div>
+          <div class="agent-summary" id="agent-summary">
+            <p>Scenario loaded. The agent has not acted yet.</p>
+          </div>
+          <div class="audit-title">
+            <span>Audit chain</span>
+            <span class="mono" id="chain-short">GENESIS</span>
+          </div>
+          <ol class="timeline" id="audit-list">
+            <li class="timeline-empty">No operational events yet.</li>
+          </ol>
+        </aside>
+      </section>
+    </main>
+
+    <footer>
+      <span>Built with Strands Agents · Human authority stays human.</span>
+      <span class="mono">HANDOVERGUARD / 2026</span>
+    </footer>
+
+    <div class="toast" id="toast" role="status" aria-live="polite"></div>
+  </body>
+</html>

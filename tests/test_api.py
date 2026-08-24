@@ -4,9 +4,11 @@ from handoverguard.api import app, get_service
 from handoverguard.repository import Repository
 from handoverguard.service import HandoverService
 
+_test_service = HandoverService(Repository(":memory:"))
+
 
 def override_service() -> HandoverService:
-    return HandoverService(Repository(":memory:"))
+    return _test_service
 
 
 app.dependency_overrides[get_service] = override_service
@@ -14,6 +16,8 @@ client = TestClient(app)
 
 
 def test_health_and_locked_live_agent() -> None:
+    assert client.get("/").status_code == 200
+    assert client.get("/static/styles.css").status_code == 200
     assert client.get("/health").json() == {"status": "ok"}
     response = client.post("/api/agent/run", json={"shift_id": "SHIFT-TEST-01"})
     assert response.status_code == 403
@@ -34,3 +38,7 @@ def test_demo_flow() -> None:
 
     audit = client.get("/api/audit/verify")
     assert audit.json()["valid"] is True
+
+    events = client.get("/api/audit/events")
+    assert events.status_code == 200
+    assert len(events.json()) == audit.json()["event_count"]
