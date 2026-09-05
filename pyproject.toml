@@ -11,6 +11,7 @@ requires-python = ">=3.12"
 license = { file = "LICENSE" }
 authors = [{ name = "Redwan Rahman" }]
 dependencies = [
+  "botocore[crt]>=1.43,<2",
   "fastapi>=0.116,<1",
   "pydantic>=2.11,<3",
   "strands-agents==1.53.0",
