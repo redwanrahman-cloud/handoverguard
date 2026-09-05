@@ -14,7 +14,15 @@ from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel, Field
 
 from .demo_data import DEMO_SHIFT_ID, demo_issues
-from .domain import AuditEvent, HandoverReport, Issue, TriageResult
+from .domain import (
+    ApprovalDecision,
+    ApprovalDecisionResult,
+    ApprovalRequest,
+    AuditEvent,
+    HandoverReport,
+    Issue,
+    TriageResult,
+)
 from .repository import Repository
 from .service import HandoverService
 from .strands_agent import run_shift_agent
@@ -27,6 +35,10 @@ class AgentRunResponse(BaseModel):
 
 class ShiftRequest(BaseModel):
     shift_id: str = Field(pattern=r"^SHIFT-[A-Z0-9-]{2,30}$")
+
+
+class ApprovalDecisionRequest(BaseModel):
+    decision: ApprovalDecision
 
 
 @lru_cache
@@ -71,6 +83,26 @@ def process_shift(request: ShiftRequest, service: ServiceDep) -> list[TriageResu
 @app.get("/api/shifts/{shift_id}/handover", response_model=HandoverReport)
 def get_handover(shift_id: str, service: ServiceDep) -> HandoverReport:
     return service.handover(shift_id)
+
+
+@app.get("/api/shifts/{shift_id}/approvals", response_model=list[ApprovalRequest])
+def get_approvals(shift_id: str, service: ServiceDep) -> list[ApprovalRequest]:
+    return service.repository.list_approvals(shift_id)
+
+
+@app.post(
+    "/api/approvals/{approval_id}/decision",
+    response_model=ApprovalDecisionResult,
+)
+def decide_approval(
+    approval_id: str,
+    request: ApprovalDecisionRequest,
+    service: ServiceDep,
+) -> ApprovalDecisionResult:
+    try:
+        return service.decide_approval(approval_id, request.decision)
+    except KeyError as error:
+        raise HTTPException(status_code=404, detail=str(error)) from error
 
 
 @app.get("/api/audit/verify")

@@ -30,9 +30,29 @@ python3 -m venv .venv
 .venv/bin/uvicorn handoverguard.api:app --reload
 ```
 
+Open `http://127.0.0.1:8000`, then:
+
+1. Run the handover agent to deduplicate the shift and create safe internal work.
+2. Review the two human checkpoints raised for compensation and safety.
+3. Approve or reject each checkpoint and watch the signed audit trail update.
+
+Approval never means that HandoverGuard silently contacted a guest, moved money, or closed
+an incident. It creates an owned follow-up task; rejection leaves the proposed action blocked.
+Both outcomes are recorded with the human decision and `external_action_executed: false`.
+
 The deterministic workflow and tests do not call a model. A live Strands cycle uses Amazon
 Bedrock and is enabled only when AWS credentials are deliberately configured. Do not place
 real guest, employee, or property data in the demo.
+
+```bash
+HANDOVERGUARD_ENABLE_LIVE_AGENT=true \
+AWS_REGION=us-east-1 \
+.venv/bin/uvicorn handoverguard.api:app
+```
+
+The live route is `POST /api/agent/run`; it remains locked with HTTP 403 unless explicitly
+enabled. The dashboard's repeatable competition scenario stays deterministic so judges can
+verify the same policy boundaries without cloud credentials.
 
 ## AI-assisted development disclosure
 
@@ -41,4 +61,3 @@ used as an AI coding assistant for implementation, testing, and documentation. A
 work is reviewed in this repository, third-party dependencies remain under their own licenses,
 and no pre-existing competition project code is incorporated. See
 [`docs/AI_ASSISTANCE.md`](docs/AI_ASSISTANCE.md).
-

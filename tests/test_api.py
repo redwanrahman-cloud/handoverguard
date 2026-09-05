@@ -32,9 +32,27 @@ def test_demo_flow() -> None:
     assert process.status_code == 200
     assert len(process.json()) == 5
 
+    approvals = client.get("/api/shifts/SHIFT-NIGHT-2408/approvals")
+    assert approvals.status_code == 200
+    assert len(approvals.json()) == 2
+    approve = client.post(
+        f"/api/approvals/{approvals.json()[0]['id']}/decision",
+        json={"decision": "approve"},
+    )
+    assert approve.status_code == 200
+    assert approve.json()["outcome"] == "approval_granted_task_created"
+    reject = client.post(
+        f"/api/approvals/{approvals.json()[1]['id']}/decision",
+        json={"decision": "reject"},
+    )
+    assert reject.status_code == 200
+    assert reject.json()["outcome"] == "approval_rejected_action_blocked"
+
     handover = client.get("/api/shifts/SHIFT-NIGHT-2408/handover")
     assert handover.status_code == 200
     assert handover.json()["unresolved_count"] == 4
+    assert handover.json()["awaiting_approval_count"] == 0
+    assert len(handover.json()["tasks"]) == 3
 
     audit = client.get("/api/audit/verify")
     assert audit.json()["valid"] is True
@@ -42,3 +60,11 @@ def test_demo_flow() -> None:
     events = client.get("/api/audit/events")
     assert events.status_code == 200
     assert len(events.json()) == audit.json()["event_count"]
+
+
+def test_unknown_approval_returns_404() -> None:
+    response = client.post(
+        "/api/approvals/APPROVAL-NOT-FOUND/decision",
+        json={"decision": "approve"},
+    )
+    assert response.status_code == 404

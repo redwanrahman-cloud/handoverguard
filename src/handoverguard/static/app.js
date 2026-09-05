@@ -40,7 +40,7 @@ function label(value) {
   return value.replaceAll("_", " ");
 }
 
-function renderIssues(issues) {
+function renderIssues(issues, approvals) {
   if (!issues.length) {
     elements.issueList.innerHTML = '<div class="empty-state">No issues in this shift.</div>';
     return;
@@ -49,10 +49,27 @@ function renderIssues(issues) {
   elements.issueList.innerHTML = issues
     .map((issue, index) => {
       const status = issue.duplicate_of ? "duplicate" : issue.status;
+      const approval = approvals.find((item) => item.issue_id === issue.id);
       const detail = [issue.department, issue.category, issue.room_label]
         .filter(Boolean)
         .map(label)
         .join(" · ");
+      const checkpoint = approval
+        ? `<div class="checkpoint checkpoint-${escapeHtml(approval.status)}">
+            <div>
+              <span class="checkpoint-label">HUMAN CHECKPOINT · ${escapeHtml(label(approval.status))}</span>
+              <p>${escapeHtml(approval.reason)}</p>
+            </div>
+            ${
+              approval.status === "pending"
+                ? `<div class="checkpoint-actions">
+                    <button class="decision decision-reject" data-approval-id="${escapeHtml(approval.id)}" data-decision="reject">Reject</button>
+                    <button class="decision decision-approve" data-approval-id="${escapeHtml(approval.id)}" data-decision="approve">Approve</button>
+                  </div>`
+                : `<span class="decision-proof mono">DECIDED BY ${escapeHtml(approval.decided_by || "human-operator")}</span>`
+            }
+          </div>`
+        : "";
       return `
         <article class="issue">
           <span class="issue-index">${String(index + 1).padStart(2, "0")}</span>
@@ -61,6 +78,7 @@ function renderIssues(issues) {
             <span>${escapeHtml(detail)}</span>
           </div>
           <span class="badge badge-${escapeHtml(status)}">${escapeHtml(label(status))}</span>
+          ${checkpoint}
         </article>`;
     })
     .join("");
@@ -98,12 +116,13 @@ function renderSummary(report) {
 }
 
 async function refresh() {
-  const [report, audit, events] = await Promise.all([
+  const [report, approvals, audit, events] = await Promise.all([
     request(`/api/shifts/${SHIFT_ID}/handover`),
+    request(`/api/shifts/${SHIFT_ID}/approvals`),
     request("/api/audit/verify"),
     request("/api/audit/events"),
   ]);
-  renderIssues(report.issues);
+  renderIssues(report.issues, approvals);
   renderAudit(events);
   renderSummary(report);
   elements.unresolvedCount.textContent = report.unresolved_count;
@@ -151,6 +170,24 @@ elements.runButton.addEventListener("click", () =>
     showToast("Safe work completed. Human checkpoints preserved.");
   }),
 );
+
+elements.issueList.addEventListener("click", async (event) => {
+  const button = event.target.closest("[data-approval-id]");
+  if (!button) return;
+  await withBusy(button, async () => {
+    const decision = button.dataset.decision;
+    await request(`/api/approvals/${button.dataset.approvalId}/decision`, {
+      method: "POST",
+      body: JSON.stringify({ decision }),
+    });
+    await refresh();
+    showToast(
+      decision === "approve"
+        ? "Approved. An owned follow-up task was created."
+        : "Rejected. The sensitive action remains blocked.",
+    );
+  });
+});
 
 async function boot() {
   try {

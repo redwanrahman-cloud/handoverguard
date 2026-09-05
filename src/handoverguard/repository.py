@@ -92,6 +92,8 @@ class Repository:
                     reason TEXT NOT NULL,
                     status TEXT NOT NULL,
                     created_at TEXT NOT NULL,
+                    decided_at TEXT,
+                    decided_by TEXT,
                     FOREIGN KEY (issue_id) REFERENCES issues(id)
                 );
 
@@ -108,6 +110,13 @@ class Repository:
                 );
                 """
             )
+            approval_columns = {
+                row["name"] for row in connection.execute("PRAGMA table_info(approvals)")
+            }
+            if "decided_at" not in approval_columns:
+                connection.execute("ALTER TABLE approvals ADD COLUMN decided_at TEXT")
+            if "decided_by" not in approval_columns:
+                connection.execute("ALTER TABLE approvals ADD COLUMN decided_by TEXT")
 
     @staticmethod
     def _issue_from_row(row: sqlite3.Row) -> Issue:
@@ -204,10 +213,28 @@ class Repository:
         with self.connection() as connection:
             connection.execute(
                 """INSERT INTO approvals
-                (id, issue_id, action, reason, status, created_at)
-                VALUES (:id, :issue_id, :action, :reason, :status, :created_at)""",
+                (id, issue_id, action, reason, status, created_at, decided_at, decided_by)
+                VALUES
+                (:id, :issue_id, :action, :reason, :status, :created_at,
+                 :decided_at, :decided_by)""",
                 values,
             )
+
+    def update_approval(self, approval: ApprovalRequest) -> None:
+        values = approval.model_dump(mode="json")
+        with self.connection() as connection:
+            connection.execute(
+                """UPDATE approvals SET status = :status, decided_at = :decided_at,
+                decided_by = :decided_by WHERE id = :id""",
+                values,
+            )
+
+    def get_approval(self, approval_id: str) -> ApprovalRequest | None:
+        with self.connection() as connection:
+            row = connection.execute(
+                "SELECT * FROM approvals WHERE id = ?", (approval_id,)
+            ).fetchone()
+        return self._approval_from_row(row) if row else None
 
     def get_approval_for_issue(self, issue_id: str) -> ApprovalRequest | None:
         with self.connection() as connection:
@@ -215,6 +242,17 @@ class Repository:
                 "SELECT * FROM approvals WHERE issue_id = ?", (issue_id,)
             ).fetchone()
         return self._approval_from_row(row) if row else None
+
+    def list_approvals(self, shift_id: str | None = None) -> list[ApprovalRequest]:
+        query = "SELECT approvals.* FROM approvals"
+        params: tuple[str, ...] = ()
+        if shift_id:
+            query += " JOIN issues ON issues.id = approvals.issue_id WHERE issues.shift_id = ?"
+            params = (shift_id,)
+        query += " ORDER BY approvals.created_at, approvals.id"
+        with self.connection() as connection:
+            rows = connection.execute(query, params).fetchall()
+        return [self._approval_from_row(row) for row in rows]
 
     def append_audit(
         self,

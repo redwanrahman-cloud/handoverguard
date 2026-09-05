@@ -8,7 +8,10 @@ from datetime import UTC, datetime
 from uuid import uuid4
 
 from .domain import (
+    ApprovalDecision,
+    ApprovalDecisionResult,
     ApprovalRequest,
+    ApprovalStatus,
     FollowUpTask,
     HandoverReport,
     Issue,
@@ -157,6 +160,70 @@ class HandoverService:
         return [
             self.triage(issue.id, actor=actor) for issue in self.repository.list_issues(shift_id)
         ]
+
+    def decide_approval(
+        self,
+        approval_id: str,
+        decision: ApprovalDecision,
+        *,
+        actor: str = "human-operator",
+    ) -> ApprovalDecisionResult:
+        approval = self.repository.get_approval(approval_id)
+        if not approval:
+            raise KeyError(f"Unknown approval: {approval_id}")
+        issue = self._require_issue(approval.issue_id)
+
+        if approval.status is not ApprovalStatus.PENDING:
+            return ApprovalDecisionResult(
+                issue=issue,
+                approval=approval,
+                outcome=f"approval_already_{approval.status.value}",
+                task=self.repository.get_task_for_issue(issue.id),
+            )
+
+        now = datetime.now(UTC)
+        approval.decided_at = now
+        approval.decided_by = actor
+        if decision is ApprovalDecision.APPROVE:
+            approval.status = ApprovalStatus.APPROVED
+            issue.status = IssueStatus.ACTIONED
+            task = FollowUpTask(
+                id=_id("TASK"),
+                issue_id=issue.id,
+                owner_department=issue.department,
+                title=f"Approved: {issue.summary}",
+                due_at=issue.due_at or now,
+                created_at=now,
+            )
+            self.repository.insert_task(task)
+            outcome = "approval_granted_task_created"
+        else:
+            approval.status = ApprovalStatus.REJECTED
+            issue.status = IssueStatus.DECLINED
+            task = None
+            outcome = "approval_rejected_action_blocked"
+
+        issue.updated_at = now
+        self.repository.update_approval(approval)
+        self.repository.update_issue(issue)
+        self.repository.append_audit(
+            event_type="human_approval_decided",
+            entity_type="issue",
+            entity_id=issue.id,
+            actor=actor,
+            payload={
+                "approval_id": approval.id,
+                "decision": decision.value,
+                "result": outcome,
+                "external_action_executed": False,
+            },
+        )
+        return ApprovalDecisionResult(
+            issue=issue,
+            approval=approval,
+            outcome=outcome,
+            task=task,
+        )
 
     def handover(self, shift_id: str) -> HandoverReport:
         issues = [

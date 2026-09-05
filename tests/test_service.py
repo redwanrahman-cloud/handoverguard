@@ -1,5 +1,5 @@
 from handoverguard.demo_data import DEMO_SHIFT_ID, demo_issues
-from handoverguard.domain import IssueStatus
+from handoverguard.domain import ApprovalDecision, ApprovalStatus, IssueStatus
 from handoverguard.repository import Repository
 from handoverguard.service import HandoverService
 
@@ -49,6 +49,41 @@ def test_safety_never_creates_an_automatic_task() -> None:
     assert result.task is None
     assert result.approval is not None
     assert result.issue.status is IssueStatus.ESCALATED
+
+
+def test_human_can_approve_sensitive_action_without_executing_it() -> None:
+    app = service()
+    compensation = app.ingest(demo_issues()[3])
+    triage = app.triage(compensation.id)
+    assert triage.approval is not None
+
+    result = app.decide_approval(triage.approval.id, ApprovalDecision.APPROVE)
+
+    assert result.outcome == "approval_granted_task_created"
+    assert result.approval.status is ApprovalStatus.APPROVED
+    assert result.issue.status is IssueStatus.ACTIONED
+    assert result.task is not None
+    assert result.task.title.startswith("Approved:")
+    event = app.repository.list_audit_events()[-1]
+    assert event.payload["external_action_executed"] is False
+
+    repeated = app.decide_approval(triage.approval.id, ApprovalDecision.REJECT)
+    assert repeated.outcome == "approval_already_approved"
+    assert repeated.approval.status is ApprovalStatus.APPROVED
+
+
+def test_human_can_reject_sensitive_action() -> None:
+    app = service()
+    safety = app.ingest(demo_issues()[-1])
+    triage = app.triage(safety.id)
+    assert triage.approval is not None
+
+    result = app.decide_approval(triage.approval.id, ApprovalDecision.REJECT)
+
+    assert result.outcome == "approval_rejected_action_blocked"
+    assert result.approval.status is ApprovalStatus.REJECTED
+    assert result.issue.status is IssueStatus.DECLINED
+    assert result.task is None
 
 
 def test_audit_tampering_is_detected() -> None:

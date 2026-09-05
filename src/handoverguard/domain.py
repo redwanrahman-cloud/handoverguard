@@ -44,6 +44,7 @@ class IssueStatus(StrEnum):
     ACTIONED = "actioned"
     AWAITING_APPROVAL = "awaiting_approval"
     ESCALATED = "escalated"
+    DECLINED = "declined"
     RESOLVED = "resolved"
 
 
@@ -53,6 +54,17 @@ class ActionKind(StrEnum):
     AUTHORIZE_COMPENSATION = "authorize_compensation"
     AUTHORIZE_PAYMENT = "authorize_payment"
     ESCALATE_SAFETY = "escalate_safety"
+
+
+class ApprovalStatus(StrEnum):
+    PENDING = "pending"
+    APPROVED = "approved"
+    REJECTED = "rejected"
+
+
+class ApprovalDecision(StrEnum):
+    APPROVE = "approve"
+    REJECT = "reject"
 
 
 class IssueCreate(BaseModel):
@@ -108,8 +120,10 @@ class ApprovalRequest(BaseModel):
     issue_id: str
     action: ActionKind
     reason: str
-    status: str = "pending"
+    status: ApprovalStatus = ApprovalStatus.PENDING
     created_at: datetime
+    decided_at: datetime | None = None
+    decided_by: str | None = None
 
 
 class AuditEvent(BaseModel):
@@ -130,6 +144,13 @@ class TriageResult(BaseModel):
     task: FollowUpTask | None = None
     approval: ApprovalRequest | None = None
     duplicate_of: str | None = None
+
+
+class ApprovalDecisionResult(BaseModel):
+    issue: Issue
+    approval: ApprovalRequest
+    outcome: str
+    task: FollowUpTask | None = None
 
 
 class HandoverReport(BaseModel):
