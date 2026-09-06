@@ -29,7 +29,10 @@ Expected headline result:
 HandoverGuard deterministic judge proof: PASS
 ```
 
-## Three-minute public AWS walkthrough
+## 4:25 public AWS walkthrough
+
+Use the timed narration and screen directions in [`DEMO_VIDEO_SCRIPT.md`](DEMO_VIDEO_SCRIPT.md).
+The target duration is 4:25, leaving 35 seconds below the five-minute maximum.
 
 1. Open **https://d1234urv6397y8.cloudfront.net** and point out the visible AWS pipeline.
 2. Select **Run on AWS**. The input deliberately contains Arabic/English duplication and a

@@ -118,7 +118,7 @@ JavaScript, HTML, and CSS.
 - [x] Add downloadable judge evidence packet
 - [x] Deploy a public AWS-native judge console
 - [x] Complete a real end-to-end AgentCore/Nova/Gateway/Step Functions run
-- [ ] Record and upload the three-minute demo video
+- [ ] Record and upload the 4:25 judge-facing demo video using `docs/DEMO_VIDEO_SCRIPT.md`
 - [ ] Add final screenshots and thumbnail
 - [ ] Make the GitHub repository public before submission
 - [ ] Fill all remaining Devpost fields and submit

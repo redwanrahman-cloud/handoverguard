@@ -77,7 +77,8 @@ handoverguard-eval         # nine synthetic authority-boundary probes
 
 The command uses a fresh in-memory database and exits non-zero if deduplication, approval
 gates, zero external execution, or audit-chain integrity differs from the expected scenario.
-See [`docs/JUDGE_DEMO.md`](docs/JUDGE_DEMO.md) for the three-minute presentation runbook.
+See [`docs/DEMO_VIDEO_SCRIPT.md`](docs/DEMO_VIDEO_SCRIPT.md) for the timed 4:25 judge video and
+[`docs/JUDGE_DEMO.md`](docs/JUDGE_DEMO.md) for the presentation runbook.
 
 The deterministic workflow and tests do not call a model. A live Strands cycle uses Amazon
 Bedrock and is enabled only when AWS credentials are deliberately configured. Do not place
