@@ -30,6 +30,7 @@ dev = [
 [project.scripts]
 handoverguard = "handoverguard.api:main"
 handoverguard-demo = "handoverguard.demo_runner:main"
+handoverguard-live-proof = "handoverguard.live_proof:main"
 
 [tool.hatch.build.targets.wheel]
 packages = ["src/handoverguard"]

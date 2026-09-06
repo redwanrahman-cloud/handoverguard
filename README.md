@@ -65,6 +65,17 @@ The live route is `POST /api/agent/run`; it remains locked with HTTP 403 unless 
 enabled. The dashboard's repeatable competition scenario stays deterministic so judges can
 verify the same policy boundaries without cloud credentials.
 
+For judge-readable evidence from a real Strands + Amazon Nova cycle, run:
+
+```bash
+AWS_REGION=us-east-1 handoverguard-live-proof
+AWS_REGION=us-east-1 handoverguard-live-proof --json
+```
+
+The command seeds only synthetic notes, lets the Strands agent call policy-bound tools, and
+then independently verifies the resulting task count, approval gates, zero external execution,
+and audit-chain integrity. It exits non-zero if any safety invariant fails.
+
 ## AI-assisted development disclosure
 
 Redwan Rahman directs the product, requirements, review, and submission. OpenAI Codex is

@@ -41,3 +41,17 @@ HandoverGuard deterministic judge proof: PASS
 
 The optional Bedrock/Strands route is additional integration evidence, not a dependency for
 this repeatable policy-bound demonstration.
+
+## Live Strands + Amazon Nova evidence
+
+With an authenticated AWS session, run:
+
+```bash
+AWS_REGION=us-east-1 handoverguard-live-proof
+```
+
+This separate proof invokes the real Strands agent through Amazon Bedrock, then checks the
+database independently of the model. A passing run proves the agent created exactly two safe
+internal tasks, held exactly two sensitive actions for human approval, executed no external
+actions, and preserved the audit chain. Use the deterministic command as the reliable demo
+backbone and the live command as cloud-integration evidence.
