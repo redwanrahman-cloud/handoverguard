@@ -40,6 +40,17 @@ Approval never means that HandoverGuard silently contacted a guest, moved money,
 an incident. It creates an owned follow-up task; rejection leaves the proposed action blocked.
 Both outcomes are recorded with the human decision and `external_action_executed: false`.
 
+For a browser-free, cloud-free judge proof, run:
+
+```bash
+handoverguard-demo
+handoverguard-demo --json  # machine-readable evidence
+```
+
+The command uses a fresh in-memory database and exits non-zero if deduplication, approval
+gates, zero external execution, or audit-chain integrity differs from the expected scenario.
+See [`docs/JUDGE_DEMO.md`](docs/JUDGE_DEMO.md) for the three-minute presentation runbook.
+
 The deterministic workflow and tests do not call a model. A live Strands cycle uses Amazon
 Bedrock and is enabled only when AWS credentials are deliberately configured. Do not place
 real guest, employee, or property data in the demo.
