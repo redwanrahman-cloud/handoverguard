@@ -39,6 +39,10 @@ def evaluate_issue(issue: IssueCreate) -> PolicyDecision:
         reasons.append("External communication requires human approval.")
     if issue.financial_impact_sar >= 100:
         reasons.append("Financial impact is SAR 100 or greater.")
+    if issue.priority is Priority.CRITICAL and not (
+        issue.safety_sensitive or issue.category is Category.SAFETY
+    ):
+        reasons.append("Critical-priority work requires an on-duty human decision.")
 
     force_escalation = (
         issue.safety_sensitive

@@ -11,6 +11,8 @@ const elements = {
   approvalCount: document.querySelector("#approval-count"),
   auditStatus: document.querySelector("#audit-status"),
   auditCount: document.querySelector("#audit-count"),
+  duplicateCount: document.querySelector("#duplicate-count"),
+  rawNoteCount: document.querySelector("#raw-note-count"),
   chainShort: document.querySelector("#chain-short"),
   toast: document.querySelector("#toast"),
 };
@@ -130,6 +132,8 @@ async function refresh() {
   elements.approvalCount.textContent = report.awaiting_approval_count;
   elements.auditStatus.textContent = audit.valid ? "Verified" : "Warning";
   elements.auditCount.textContent = `${audit.event_count} signed operational events`;
+  elements.duplicateCount.textContent = report.duplicate_count;
+  elements.rawNoteCount.textContent = `${report.raw_note_count} raw notes · ${report.unresolved_count} canonical issues`;
 }
 
 function showToast(message) {

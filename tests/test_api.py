@@ -1,3 +1,6 @@
+import hashlib
+import json
+
 from fastapi.testclient import TestClient
 
 from handoverguard.api import app, get_service
@@ -53,6 +56,8 @@ def test_demo_flow() -> None:
     assert handover.json()["unresolved_count"] == 4
     assert handover.json()["awaiting_approval_count"] == 0
     assert len(handover.json()["tasks"]) == 3
+    assert handover.json()["raw_note_count"] == 5
+    assert handover.json()["duplicate_count"] == 1
 
     audit = client.get("/api/audit/verify")
     assert audit.json()["valid"] is True
@@ -60,6 +65,17 @@ def test_demo_flow() -> None:
     events = client.get("/api/audit/events")
     assert events.status_code == 200
     assert len(events.json()) == audit.json()["event_count"]
+
+    evidence = client.get("/api/shifts/SHIFT-NIGHT-2408/evidence")
+    assert evidence.status_code == 200
+    packet = evidence.json()
+    assert packet["schema_version"] == "handoverguard-evidence-v1"
+    assert packet["audit_chain_valid"] is True
+    assert packet["external_actions_executed"] == 0
+    digest = packet.pop("evidence_digest")
+    canonical = json.dumps(packet, sort_keys=True, separators=(",", ":"))
+    assert hashlib.sha256(canonical.encode()).hexdigest() == digest
+    assert "attachment" in evidence.headers["content-disposition"]
 
 
 def test_unknown_approval_returns_404() -> None:

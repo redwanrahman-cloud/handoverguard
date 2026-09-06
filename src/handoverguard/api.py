@@ -2,14 +2,18 @@
 
 from __future__ import annotations
 
+import hashlib
+import json
 import os
+from datetime import UTC, datetime
 from functools import lru_cache
 from pathlib import Path
 from typing import Annotated
 
 import uvicorn
 from fastapi import Depends, FastAPI, HTTPException
-from fastapi.responses import FileResponse
+from fastapi.encoders import jsonable_encoder
+from fastapi.responses import FileResponse, JSONResponse
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel, Field
 
@@ -19,6 +23,7 @@ from .domain import (
     ApprovalDecisionResult,
     ApprovalRequest,
     AuditEvent,
+    EvidencePacket,
     HandoverReport,
     Issue,
     TriageResult,
@@ -117,6 +122,37 @@ def verify_audit(service: ServiceDep) -> dict[str, bool | int]:
 @app.get("/api/audit/events", response_model=list[AuditEvent])
 def audit_events(service: ServiceDep) -> list[AuditEvent]:
     return service.repository.list_audit_events()
+
+
+@app.get("/api/shifts/{shift_id}/evidence", response_model=EvidencePacket)
+def export_evidence(shift_id: str, service: ServiceDep) -> JSONResponse:
+    """Export independently verifiable state without triggering any side effect."""
+
+    report = service.handover(shift_id)
+    approvals = service.repository.list_approvals(shift_id)
+    audit_events = service.repository.list_audit_events()
+    evidence = {
+        "schema_version": "handoverguard-evidence-v1",
+        "generated_at": datetime.now(UTC),
+        "report": report,
+        "approvals": approvals,
+        "audit_events": audit_events,
+        "audit_chain_valid": service.repository.verify_audit_chain(),
+        "external_actions_executed": 0,
+        "digest_algorithm": "sha256",
+    }
+    evidence["evidence_digest"] = "0" * 64
+    packet = EvidencePacket.model_validate(evidence)
+    encoded = jsonable_encoder(packet)
+    encoded.pop("evidence_digest")
+    canonical = json.dumps(encoded, sort_keys=True, separators=(",", ":"))
+    encoded["evidence_digest"] = hashlib.sha256(canonical.encode()).hexdigest()
+    return JSONResponse(
+        content=encoded,
+        headers={
+            "Content-Disposition": f'attachment; filename="handoverguard-{shift_id}-evidence.json"'
+        },
+    )
 
 
 @app.post("/api/agent/run", response_model=AgentRunResponse)

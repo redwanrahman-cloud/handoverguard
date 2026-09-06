@@ -182,11 +182,15 @@ h1 em {
 
 .hero-actions {
   display: flex;
+  flex-wrap: wrap;
   gap: 10px;
   padding-bottom: 5px;
 }
 
 .button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   min-height: 48px;
   padding: 0 18px;
   border: 1px solid transparent;
@@ -194,6 +198,7 @@ h1 em {
   cursor: pointer;
   font-size: 12px;
   font-weight: 700;
+  text-decoration: none;
   transition: 180ms ease;
 }
 
@@ -260,7 +265,7 @@ h1 em {
 
 .metrics {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
+  grid-template-columns: repeat(5, 1fr);
   gap: 12px;
   margin-bottom: 12px;
 }
@@ -305,6 +310,66 @@ h1 em {
 .metric-blue::before {
   background: var(--blue);
   opacity: 1;
+}
+
+.metric-purple::before {
+  background: #a78bfa;
+  opacity: 1;
+}
+
+.proof-strip {
+  display: grid;
+  grid-template-columns: minmax(260px, 0.9fr) minmax(430px, 1.5fr) auto;
+  gap: 24px;
+  align-items: center;
+  margin-bottom: 12px;
+  padding: 18px 22px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: rgba(11, 19, 16, 0.75);
+}
+
+.proof-strip .eyebrow {
+  margin-bottom: 7px;
+}
+
+.proof-strip strong {
+  font-size: 13px;
+}
+
+.proof-flow {
+  display: flex;
+  gap: 9px;
+  align-items: center;
+  justify-content: center;
+  color: var(--faint);
+  font-size: 9px;
+}
+
+.proof-flow b {
+  color: var(--green);
+}
+
+.zero-action {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  padding-left: 20px;
+  border-left: 1px solid var(--line);
+}
+
+.zero-action strong {
+  color: var(--green);
+  font-family: "DM Mono", monospace;
+  font-size: 31px;
+}
+
+.zero-action span {
+  max-width: 90px;
+  color: var(--muted);
+  font-size: 9px;
+  line-height: 1.35;
+  text-transform: uppercase;
 }
 
 .metric-label,
@@ -690,6 +755,20 @@ footer {
 
   .workspace-grid {
     grid-template-columns: 1fr;
+  }
+
+  .proof-strip {
+    grid-template-columns: 1fr;
+  }
+
+  .proof-flow {
+    justify-content: flex-start;
+    flex-wrap: wrap;
+  }
+
+  .zero-action {
+    padding: 0;
+    border-left: 0;
   }
 }
 

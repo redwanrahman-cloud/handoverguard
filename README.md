@@ -4,6 +4,13 @@ HandoverGuard is a policy-bound AI agent for hotel shift handovers. It turns noi
 operational notes into owned follow-up work, while holding safety, guest compensation,
 payments, and external communications for explicit human approval.
 
+See the standalone [architecture diagram](docs/ARCHITECTURE.html) for the model, policy,
+storage, human-authority, and external-action trust boundaries.
+
+![HandoverGuard dashboard](docs/DASHBOARD.png)
+
+![HandoverGuard architecture](docs/ARCHITECTURE.png)
+
 This repository was created on 24 August 2026 for the Amazon **Agents for Humans**
 Hackathon. It is a new project, not an extension of a previous competition entry.
 
@@ -35,6 +42,7 @@ Open `http://127.0.0.1:8000`, then:
 1. Run the handover agent to deduplicate the shift and create safe internal work.
 2. Review the two human checkpoints raised for compensation and safety.
 3. Approve or reject each checkpoint and watch the signed audit trail update.
+4. Download the digest-bearing JSON evidence packet for independent review.
 
 Approval never means that HandoverGuard silently contacted a guest, moved money, or closed
 an incident. It creates an owned follow-up task; rejection leaves the proposed action blocked.
@@ -45,6 +53,7 @@ For a browser-free, cloud-free judge proof, run:
 ```bash
 handoverguard-demo
 handoverguard-demo --json  # machine-readable evidence
+handoverguard-eval         # nine synthetic authority-boundary probes
 ```
 
 The command uses a fresh in-memory database and exits non-zero if deduplication, approval

@@ -50,6 +50,9 @@
             Run the handover agent
           </button>
           <button class="button button-secondary" id="reset-button">Reset scenario</button>
+          <a class="button button-secondary" id="evidence-button" href="/api/shifts/SHIFT-NIGHT-2408/evidence" download>
+            Download proof
+          </a>
         </div>
       </section>
 
@@ -60,6 +63,11 @@
       </section>
 
       <section class="metrics" aria-label="Shift metrics">
+        <article class="metric metric-purple">
+          <div class="metric-label">Noise removed</div>
+          <div class="metric-value" id="duplicate-count">—</div>
+          <div class="metric-foot" id="raw-note-count">Duplicate notes prevented</div>
+        </article>
         <article class="metric">
           <div class="metric-label">Open decisions</div>
           <div class="metric-value" id="unresolved-count">—</div>
@@ -80,6 +88,17 @@
           <div class="metric-value metric-word" id="audit-status">—</div>
           <div class="metric-foot" id="audit-count">Waiting for events</div>
         </article>
+      </section>
+
+      <section class="proof-strip" aria-label="Enforced trust boundary">
+        <div>
+          <p class="eyebrow">ENFORCED TRUST BOUNDARY</p>
+          <strong>Nova interprets. Server policy authorizes. Humans decide.</strong>
+        </div>
+        <div class="proof-flow mono">
+          <span>SHIFT NOTES</span><b>→</b><span>STRANDS + NOVA</span><b>→</b><span>POLICY GATE</span><b>→</b><span>TASK OR HUMAN</span>
+        </div>
+        <div class="zero-action"><strong>0</strong><span>silent external actions</span></div>
       </section>
 
       <section class="workspace-grid">

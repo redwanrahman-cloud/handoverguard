@@ -161,3 +161,19 @@ class HandoverReport(BaseModel):
     critical_count: int
     issues: list[Issue]
     tasks: list[FollowUpTask]
+    raw_note_count: int
+    duplicate_count: int
+
+
+class EvidencePacket(BaseModel):
+    """Portable, digest-bearing proof of one shift's guarded execution."""
+
+    schema_version: str = "handoverguard-evidence-v1"
+    generated_at: datetime
+    report: HandoverReport
+    approvals: list[ApprovalRequest]
+    audit_events: list[AuditEvent]
+    audit_chain_valid: bool
+    external_actions_executed: int = 0
+    digest_algorithm: str = "sha256"
+    evidence_digest: str

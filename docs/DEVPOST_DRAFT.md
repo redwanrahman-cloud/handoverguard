@@ -44,6 +44,8 @@ owned follow-up task. Rejection leaves the proposed action blocked.
 - **A deterministic proof CLI** reproduces the full workflow without cloud credentials.
 - **A live proof CLI** invokes Strands through Bedrock and independently verifies the resulting
   database state after the model finishes.
+- **A digest-bearing evidence export** lets a reviewer download the report, approvals, full
+  audit chain, zero-external-action count, and SHA-256 proof digest from the dashboard.
 
 All demonstration data is synthetic. No real guest, employee, or property data is used.
 
@@ -65,6 +67,9 @@ audit chain differ from the expected scenario.
 - Approval and rejection are idempotent and auditable.
 - Every state-changing event participates in a verified hash chain.
 - The same safety invariants are covered by automated tests and judge-readable proof commands.
+- Nine reproducible synthetic policy probes cover routine operations, compensation, payments,
+  external-message prompt injection, the SAR 100 boundary, critical severity, and safety;
+  all nine pass with zero external actions.
 
 ## What was learned
 
@@ -95,6 +100,8 @@ JavaScript, HTML, and CSS.
 - [x] Human approval/rejection loop
 - [x] Live Strands + Bedrock proof command
 - [x] Capture a passing live-proof artifact from authenticated AWS CloudShell
+- [x] Add a standalone architecture diagram
+- [x] Add downloadable judge evidence packet
 - [ ] Record and upload the three-minute demo video
 - [ ] Add final screenshots and thumbnail
 - [ ] Make the GitHub repository public before submission

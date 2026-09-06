@@ -226,9 +226,10 @@ class HandoverService:
         )
 
     def handover(self, shift_id: str) -> HandoverReport:
+        raw_issues = self.repository.list_issues(shift_id)
         issues = [
             issue
-            for issue in self.repository.list_issues(shift_id)
+            for issue in raw_issues
             if issue.status is not IssueStatus.RESOLVED and issue.duplicate_of is None
         ]
         tasks = self.repository.list_tasks([issue.id for issue in issues]) if issues else []
@@ -243,6 +244,8 @@ class HandoverService:
             critical_count=sum(issue.priority is Priority.CRITICAL for issue in issues),
             issues=issues,
             tasks=tasks,
+            raw_note_count=len(raw_issues),
+            duplicate_count=sum(issue.duplicate_of is not None for issue in raw_issues),
         )
 
     def _require_issue(self, issue_id: str) -> Issue:
