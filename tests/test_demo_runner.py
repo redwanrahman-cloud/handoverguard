@@ -1,5 +1,7 @@
 import json
 
+import pytest
+
 from handoverguard.demo_runner import main, run_demo_proof
 
 
@@ -20,7 +22,10 @@ def test_deterministic_demo_proves_safety_invariants() -> None:
     assert proof.safety_invariants_passed is True
 
 
-def test_demo_cli_can_emit_machine_readable_proof(monkeypatch, capsys) -> None:
+def test_demo_cli_can_emit_machine_readable_proof(
+    monkeypatch: pytest.MonkeyPatch,
+    capsys: pytest.CaptureFixture[str],
+) -> None:
     monkeypatch.setattr("sys.argv", ["handoverguard-demo", "--json"])
 
     main()

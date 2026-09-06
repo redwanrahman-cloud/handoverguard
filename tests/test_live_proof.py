@@ -1,5 +1,7 @@
 import json
 
+import pytest
+
 from handoverguard.live_proof import main, run_live_proof
 from handoverguard.service import HandoverService
 
@@ -23,7 +25,10 @@ def test_live_proof_verifies_post_agent_policy_state() -> None:
     assert proof.safety_invariants_passed is True
 
 
-def test_live_proof_cli_can_emit_json(monkeypatch, capsys) -> None:
+def test_live_proof_cli_can_emit_json(
+    monkeypatch: pytest.MonkeyPatch,
+    capsys: pytest.CaptureFixture[str],
+) -> None:
     monkeypatch.setattr(
         "handoverguard.live_proof.run_live_proof",
         lambda: run_live_proof(fake_agent_runner),
