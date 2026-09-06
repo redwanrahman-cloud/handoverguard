@@ -1,5 +1,9 @@
 # HandoverGuard — 4:25 judge video script
 
+> **Production note:** The approved Brian voiceover and final spoken wording live in
+> [`NARRATION_MASTER.md`](NARRATION_MASTER.md). This document remains the detailed screen-action
+> runbook; the reproducible continuous-capture harness lives in [`tools/video`](../tools/video).
+
 Target duration: **4 minutes 25 seconds**. This leaves 35 seconds below the competition's
 five-minute maximum. Rehearse once before recording; do not speed up to fit more content.
 
@@ -119,4 +123,3 @@ trace rows. Briefly switch to the architecture diagram if the trace pauses.
 - No AWS account IDs, credentials, callback tokens, private email, or console secrets are visible.
 - The video shows a fresh run rather than relying only on static screenshots.
 - Captions are enabled or burned in, especially for AWS service names.
-
