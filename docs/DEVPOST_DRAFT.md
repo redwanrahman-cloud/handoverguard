@@ -18,10 +18,10 @@ while preserving human authority over safety, compensation, payments, and guest 
 
 ## What it does
 
-HandoverGuard ingests a synthetic hotel shift, deduplicates repeated notes, applies explicit
-policy, and creates routine internal follow-up tasks automatically. Sensitive actions become
-human approval requests instead of model-side side effects. An operator can approve or reject
-each request, and either decision is recorded in a tamper-evident SHA-256 audit chain.
+HandoverGuard sends a synthetic bilingual shift through a visible AWS execution pipeline. Nova
+extracts canonical issues; deterministic policy creates routine internal work while safety,
+financial, compensation, and guest-contact actions become Step Functions approval waits. A judge
+can approve or reject them in the public console and watch the managed service trace update.
 
 The competition scenario demonstrates five notes:
 
@@ -35,12 +35,19 @@ owned follow-up task. Rejection leaves the proposed action blocked.
 
 ## How it was built
 
-- **Strands Agents SDK** provides the agent loop and policy-bound tools.
-- **Amazon Bedrock / Amazon Nova Lite** provides the live model path.
-- **FastAPI and Pydantic** provide typed API and validation boundaries.
-- **SQLite** stores issues, tasks, approvals, and append-only audit events.
-- **Server-side policy** decides which actions are autonomous and which require approval; the
-  language model cannot weaken these rules.
+- **Amazon CloudFront** serves the public judge console over HTTPS.
+- **Amazon API Gateway** validates synthetic submissions and allocates run IDs.
+- **Amazon S3, EventBridge, and SQS** preserve raw input, create managed events, and isolate
+  retries through a dead-letter queue.
+- **Amazon Bedrock AgentCore Runtime** hosts the Python supervisor built with **Strands Agents**.
+- **Amazon Bedrock Guardrails** inspects input before **Amazon Nova Lite** performs bilingual,
+  schema-validated extraction.
+- **AgentCore Gateway** exposes only three narrow MCP tools backed by **AWS Lambda**; there is no
+  send, charge, refund, resolve, or guest-contact tool.
+- **Lambda policy** decides autonomous vs. human work independently of the model.
+- **Amazon DynamoDB** stores idempotent run state with point-in-time recovery.
+- **AWS Step Functions callback tokens and Amazon SNS** implement genuine human approval waits.
+- **Amazon S3 evidence packets and CloudWatch/X-Ray** preserve proof and operational telemetry.
 - **A deterministic proof CLI** reproduces the full workflow without cloud credentials.
 - **A live proof CLI** invokes Strands through Bedrock and independently verifies the resulting
   database state after the model finishes.
@@ -55,9 +62,10 @@ The central challenge was making human oversight an enforceable system property 
 prompt promise. HandoverGuard therefore treats the model as a caller of narrow tools. The tools
 enforce approval gates, idempotency, deduplication, and audit recording on the server side.
 
-A second challenge was producing evidence judges can trust. The deterministic and live proof
-commands exit non-zero if task counts, approval counts, zero-external-action guarantees, or the
-audit chain differ from the expected scenario.
+A second challenge was producing evidence judges can trust. The first real AgentCore run exposed
+an incomplete model/tool loop; a later public run exposed bilingual duplication. We fixed both as
+server-enforced invariants rather than hiding them with prompt wording. The console now shows
+service-level evidence, latency, policy decisions, approval waits, and zero external actions.
 
 ## Accomplishments
 
@@ -70,6 +78,10 @@ audit chain differ from the expected scenario.
 - Nine reproducible synthetic policy probes cover routine operations, compensation, payments,
   external-message prompt injection, the SAR 100 boundary, critical severity, and safety;
   all nine pass with zero external actions.
+- A real AWS vertical slice is deployed and publicly testable at
+  **https://d1234urv6397y8.cloudfront.net**.
+- The live proof uses AgentCore Runtime, AgentCore Gateway, Bedrock Guardrails, Nova Lite,
+  Step Functions, DynamoDB, S3, EventBridge, SQS, SNS, API Gateway, CloudFront, and CloudWatch.
 
 ## What was learned
 
@@ -87,7 +99,9 @@ evidence. Keeping those layers separate makes an agent easier to trust, test, an
 
 ## Built with
 
-Python, Strands Agents SDK, Amazon Bedrock, Amazon Nova Lite, FastAPI, Pydantic, SQLite,
+Python, TypeScript, AWS CDK, Strands Agents SDK, Amazon Bedrock AgentCore Runtime, AgentCore
+Gateway, Amazon Bedrock Guardrails, Amazon Nova Lite, AWS Lambda, Step Functions, DynamoDB, S3,
+EventBridge, SQS, SNS, API Gateway, CloudFront, CloudWatch/X-Ray, FastAPI, Pydantic, SQLite,
 JavaScript, HTML, and CSS.
 
 ## Submission checklist
@@ -102,6 +116,8 @@ JavaScript, HTML, and CSS.
 - [x] Capture a passing live-proof artifact from authenticated AWS CloudShell
 - [x] Add a standalone architecture diagram
 - [x] Add downloadable judge evidence packet
+- [x] Deploy a public AWS-native judge console
+- [x] Complete a real end-to-end AgentCore/Nova/Gateway/Step Functions run
 - [ ] Record and upload the three-minute demo video
 - [ ] Add final screenshots and thumbnail
 - [ ] Make the GitHub repository public before submission

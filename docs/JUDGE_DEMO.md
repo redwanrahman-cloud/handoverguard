@@ -29,18 +29,21 @@ Expected headline result:
 HandoverGuard deterministic judge proof: PASS
 ```
 
-## Three-minute dashboard walkthrough
+## Three-minute public AWS walkthrough
 
-1. Start `handoverguard`, open `http://127.0.0.1:8000`, and select **Reset scenario**.
-2. Select **Run the handover agent**. Point out the two internal tasks, linked duplicate,
-   compensation checkpoint, safety escalation, and verified audit chain.
-3. Approve the compensation checkpoint. Explain that approval creates an owned follow-up
-   task; it does not contact the guest or move money.
-4. Reject the safety checkpoint. Explain that rejection leaves the proposed action blocked.
-5. Show the new signed audit events and repeat that all displayed data is synthetic.
+1. Open **https://d1234urv6397y8.cloudfront.net** and point out the visible AWS pipeline.
+2. Select **Run on AWS**. The input deliberately contains Arabic/English duplication and a
+   prompt-injection attempt.
+3. Narrate each live hop: API Gateway, versioned S3 input, EventBridge/SQS delivery, AgentCore
+   Runtime, Guardrails latency, Nova/Strands extraction, Gateway tools, Lambda policy, DynamoDB,
+   Step Functions, and S3 evidence.
+4. Show the expected outcome: three canonical issues, one safe internal task, two approval waits,
+   and zero external actions.
+5. Approve one checkpoint and reject the other. Show both Step Functions resume events and final
+   `APPROVED` / `REJECTED` cards.
 
-The optional Bedrock/Strands route is additional integration evidence, not a dependency for
-this repeatable policy-bound demonstration.
+The local deterministic proof remains the offline fallback; the public AWS path is the primary
+competition demonstration.
 
 ## Live Strands + Amazon Nova evidence
 

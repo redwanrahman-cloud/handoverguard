@@ -28,6 +28,25 @@ HandoverGuard performs the safe routine work and surfaces only decisions that ne
 - Every state change is appended to a tamper-evident SHA-256 audit chain.
 - The agent never marks an issue resolved without an explicit human action.
 
+## AWS-native competition deployment
+
+**Public judge console:** https://d1234urv6397y8.cloudfront.net
+
+The public judge console exposes the managed execution path rather than presenting AWS as a
+hidden model call:
+
+`API Gateway → S3 → EventBridge → SQS → AgentCore Runtime → Bedrock Guardrails → Nova → AgentCore Gateway → Lambda/DynamoDB → Step Functions/SNS → S3 evidence → CloudWatch`
+
+See [infra/README.md](infra/README.md) for the service-by-service rationale and reproducible CDK
+deployment.
+
+The deployed supervisor is not a local application with a token model call. Amazon S3 and
+EventBridge create the work event, SQS provides retry isolation, AgentCore Runtime hosts the
+Strands supervisor, Bedrock Guardrails inspects input, Nova produces schema-validated canonical
+issues, AgentCore Gateway exposes narrow MCP tools, Lambda enforces authority, DynamoDB stores
+idempotent state, and Step Functions holds callback tokens until a judge approves or rejects.
+The console displays this execution trace and evidence live.
+
 ## Local setup
 
 ```bash

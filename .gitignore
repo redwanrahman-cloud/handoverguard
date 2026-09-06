@@ -15,3 +15,9 @@ build/
 data/*.db
 data/*.db-*
 
+# AWS CDK and AgentCore build output
+.cdk.staging/
+infra/cdk.out/
+infra/node_modules/
+infra/cloud/agent/deployment_package/
+infra/cloud/agent/runtime.zip

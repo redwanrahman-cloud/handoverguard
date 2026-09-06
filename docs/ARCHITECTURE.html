@@ -1,45 +1,39 @@
 <!doctype html>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>HandoverGuard architecture</title>
+<title>HandoverGuard AWS-native architecture</title>
 <style>
-  :root { color-scheme:light dark; --bg:#f8fafc; --fg:#172033; --muted:#5b6475; --line:#64748b; --neutral:#e2e8f0; --input:#bfdbfe; --process:#c7d2fe; --storage:#99f6e4; --external:#fde68a; --risk:#fecaca; }
-  @media (prefers-color-scheme:dark) { :root { --bg:#0f172a; --fg:#e5e7eb; --muted:#a3adbd; --line:#94a3b8; --neutral:#334155; --input:#1d4ed8; --process:#4338ca; --storage:#0f766e; --external:#92400e; --risk:#991b1b; } }
-  body { margin:0; background:var(--bg); color:var(--fg); font:14px/1.4 ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif; }
-  main { max-width:1180px; margin:28px auto; padding:0 20px; } svg { width:100%; height:auto; display:block; }
-  .title { font-size:25px; font-weight:700; fill:var(--fg); } .subtitle,.small { font-size:12px; fill:var(--muted); }
-  .zone-title { font-size:11px; font-weight:700; letter-spacing:1px; fill:var(--muted); } .label { font-size:14px; font-weight:700; fill:var(--fg); }
-  .node { stroke:var(--line); stroke-width:1; } .neutral { fill:var(--neutral); } .input { fill:var(--input); } .process { fill:var(--process); } .storage { fill:var(--storage); } .external { fill:var(--external); } .risk { fill:var(--risk); }
-  .edge { stroke:var(--line); stroke-width:2; fill:none; marker-end:url(#arrow); } .blocked { stroke:#ef4444; stroke-width:2; stroke-dasharray:7 5; fill:none; marker-end:url(#block-arrow); }
-  .zone { fill:none; stroke:var(--line); stroke-width:1; stroke-dasharray:7 6; opacity:.8; }
+  :root{color-scheme:dark;--bg:#08111f;--fg:#f8fafc;--muted:#a9b5c8;--blue:#123b69;--purple:#382c70;--teal:#075f5b;--orange:#864009;--red:#7f1d1d}
+  *{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--fg);font:14px/1.4 Inter,ui-sans-serif,system-ui,sans-serif}main{max-width:1400px;margin:24px auto;padding:0 18px}svg{width:100%;height:auto;display:block}.title{font-size:27px;font-weight:800;fill:var(--fg)}.sub{font-size:13px;fill:var(--muted)}.zone{fill:none;stroke:#48627e;stroke-width:1;stroke-dasharray:7 6}.zt{font-size:11px;font-weight:800;letter-spacing:1.2px;fill:#9fb2c9}.node{stroke:#89a0ba;stroke-width:1}.input{fill:var(--blue)}.ai{fill:var(--purple)}.store{fill:var(--teal)}.approval{fill:var(--orange)}.blocked{fill:var(--red)}.label{font-size:14px;font-weight:800;fill:#fff}.small{font-size:11.5px;fill:#d2dbea}.edge{stroke:#8ca2bb;stroke-width:2;fill:none;marker-end:url(#a)}.event{stroke:#5eead4}.deny{stroke:#fb7185;stroke-dasharray:7 5;marker-end:url(#r)}
 </style>
-<main>
-  <svg viewBox="0 0 1180 720" role="img" aria-labelledby="diagram-title diagram-desc">
-    <title id="diagram-title">HandoverGuard policy-bound agent architecture</title>
-    <desc id="diagram-desc">Synthetic hotel notes enter FastAPI. A Strands agent using Amazon Nova calls narrow tools. Deterministic server policy creates internal tasks or human approvals. SQLite persists state and a hash-chain audit. External actions remain blocked.</desc>
-    <defs>
-      <marker id="arrow" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto" markerUnits="strokeWidth"><path d="M0,0 L0,6 L9,3 z" fill="var(--line)" /></marker>
-      <marker id="block-arrow" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto" markerUnits="strokeWidth"><path d="M0,0 L0,6 L9,3 z" fill="#ef4444" /></marker>
-    </defs>
-    <text x="30" y="38" class="title">HandoverGuard · Policy-bound hotel operations agent</text>
-    <text x="30" y="62" class="subtitle">Probabilistic interpretation is separated from deterministic authority and evidence.</text>
-    <rect x="215" y="92" width="720" height="545" rx="18" class="zone" /><text x="235" y="118" class="zone-title">HANDOVERGUARD TRUST ZONE</text>
-    <rect x="960" y="92" width="190" height="545" rx="18" class="zone" /><text x="980" y="118" class="zone-title">OUTSIDE BOUNDARY</text>
-    <path d="M185 210 H260" class="edge" /><path d="M430 210 H500" class="edge" /><path d="M675 210 H745" class="edge" />
-    <path d="M830 270 V330" class="edge" /><path d="M745 402 H675" class="edge" /><path d="M585 470 V530" class="edge" />
-    <path d="M500 402 H430" class="edge" /><path d="M345 470 V530" class="edge" /><path d="M430 575 H500" class="edge" />
-    <path d="M675 575 H745" class="edge" /><path d="M915 575 H995" class="blocked" />
-    <rect x="30" y="155" width="155" height="110" rx="14" class="node input" /><text x="52" y="190" class="label">Shift notes</text><text x="52" y="215" class="small">Maintenance</text><text x="52" y="234" class="small">Guest · Safety · Pay</text>
-    <rect x="260" y="155" width="170" height="110" rx="14" class="node neutral" /><text x="284" y="190" class="label">FastAPI boundary</text><text x="284" y="215" class="small">Typed validation</text><text x="284" y="234" class="small">Synthetic-only demo</text>
-    <rect x="500" y="155" width="175" height="110" rx="14" class="node process" /><text x="524" y="190" class="label">Strands Agent</text><text x="524" y="215" class="small">Complete-shift tool</text><text x="524" y="234" class="small">Idempotent execution</text>
-    <rect x="745" y="155" width="170" height="110" rx="14" class="node external" /><text x="769" y="190" class="label">Amazon Bedrock</text><text x="769" y="215" class="small">Amazon Nova Lite</text><text x="769" y="234" class="small">Interpretation only</text>
-    <rect x="745" y="330" width="170" height="140" rx="14" class="node risk" /><text x="769" y="365" class="label">Server policy gate</text><text x="769" y="392" class="small">Safety · Compensation</text><text x="769" y="411" class="small">Payment · Guest contact</text><text x="769" y="438" class="small">Model cannot bypass</text>
-    <rect x="500" y="330" width="175" height="140" rx="14" class="node process" /><text x="524" y="365" class="label">Workflow service</text><text x="524" y="392" class="small">Deduplicate notes</text><text x="524" y="411" class="small">Assign owners + SLAs</text><text x="524" y="430" class="small">Enforce state machine</text>
-    <rect x="260" y="330" width="170" height="140" rx="14" class="node storage" /><text x="284" y="365" class="label">SQLite state</text><text x="284" y="392" class="small">Issues · Tasks</text><text x="284" y="411" class="small">Approval decisions</text><text x="284" y="430" class="small">SHA-256 audit chain</text>
-    <rect x="260" y="530" width="170" height="90" rx="14" class="node neutral" /><text x="284" y="565" class="label">Evidence packet</text><text x="284" y="590" class="small">Digest-bearing JSON</text>
-    <rect x="500" y="530" width="175" height="90" rx="14" class="node input" /><text x="524" y="565" class="label">Operator dashboard</text><text x="524" y="590" class="small">Approve · Reject · Inspect</text>
-    <rect x="745" y="530" width="170" height="90" rx="14" class="node process" /><text x="769" y="565" class="label">Owned follow-up</text><text x="769" y="590" class="small">Internal task only</text>
-    <rect x="995" y="530" width="130" height="90" rx="14" class="node risk" /><text x="1019" y="565" class="label">External action</text><text x="1019" y="590" class="small">Blocked in demo</text>
-    <text x="30" y="685" class="small">Red dashed edge: explicit boundary. Approval creates accountable internal work; it never silently contacts a guest, moves money, or closes an incident.</text>
-  </svg>
-</main>
+<main><svg viewBox="0 0 1360 780" role="img" aria-labelledby="title desc">
+  <title id="title">HandoverGuard AWS-native execution architecture</title>
+  <desc id="desc">A public judge console submits synthetic handovers through managed AWS ingestion. AgentCore Runtime applies Bedrock Guardrails, invokes Nova with Strands, then calls narrow AgentCore Gateway tools. Lambda policy creates DynamoDB tasks or Step Functions human approvals while S3 and CloudWatch retain evidence. No external hotel action exists.</desc>
+  <defs><marker id="a" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto"><path d="M0 0L0 6L9 3z" fill="#8ca2bb"/></marker><marker id="r" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto"><path d="M0 0L0 6L9 3z" fill="#fb7185"/></marker></defs>
+  <text x="28" y="36" class="title">HandoverGuard · AWS-native policy-bound agent</text>
+  <text x="28" y="60" class="sub">The judge sees every managed hop: input, model latency, Gateway tool calls, authority decisions, approval waits, and evidence.</text>
+  <rect x="20" y="90" width="1320" height="180" rx="18" class="zone"/><text x="40" y="116" class="zt">1 · MANAGED INGESTION</text>
+  <rect x="45" y="145" width="170" height="88" rx="13" class="node input"/><text x="65" y="178" class="label">CloudFront console</text><text x="65" y="202" class="small">Public synthetic demo</text>
+  <rect x="275" y="145" width="170" height="88" rx="13" class="node input"/><text x="295" y="178" class="label">API Gateway</text><text x="295" y="202" class="small">Validation · run ID</text>
+  <rect x="505" y="145" width="170" height="88" rx="13" class="node store"/><text x="525" y="178" class="label">Amazon S3</text><text x="525" y="202" class="small">Versioned raw input</text>
+  <rect x="735" y="145" width="170" height="88" rx="13" class="node input"/><text x="755" y="178" class="label">EventBridge</text><text x="755" y="202" class="small">Object-created event</text>
+  <rect x="965" y="145" width="170" height="88" rx="13" class="node input"/><text x="985" y="178" class="label">Amazon SQS</text><text x="985" y="202" class="small">Retry + dead-letter queue</text>
+  <rect x="1195" y="145" width="120" height="88" rx="13" class="node ai"/><text x="1213" y="178" class="label">Dispatcher</text><text x="1213" y="202" class="small">Invoke runtime</text>
+  <path d="M215 189H275M445 189H505M675 189H735M905 189H965M1135 189H1195" class="edge event"/>
+  <rect x="20" y="295" width="1320" height="205" rx="18" class="zone"/><text x="40" y="321" class="zt">2 · AGENT INTELLIGENCE — PROBABILISTIC INTERPRETATION, NO AUTHORITY</text>
+  <rect x="95" y="360" width="210" height="96" rx="13" class="node ai"/><text x="118" y="393" class="label">AgentCore Runtime</text><text x="118" y="417" class="small">ARM64 Python · managed host</text><text x="118" y="436" class="small">Coordinates complete shift</text>
+  <rect x="380" y="360" width="210" height="96" rx="13" class="node ai"/><text x="403" y="393" class="label">Bedrock Guardrails</text><text x="403" y="417" class="small">Input inspection · PII filter</text><text x="403" y="436" class="small">Prompt-injection boundary</text>
+  <rect x="665" y="360" width="210" height="96" rx="13" class="node ai"/><text x="688" y="393" class="label">Nova Lite + Strands</text><text x="688" y="417" class="small">Bilingual structured extraction</text><text x="688" y="436" class="small">Canonical incident keys</text>
+  <rect x="950" y="360" width="300" height="96" rx="13" class="node ai"/><text x="973" y="393" class="label">AgentCore Gateway · MCP</text><text x="973" y="417" class="small">record_trace · route_issue · write_evidence</text><text x="973" y="436" class="small">No send · charge · refund · resolve tools</text>
+  <path d="M1200 233V285H200V360M305 408H380M590 408H665M875 408H950" class="edge"/>
+  <rect x="20" y="525" width="1320" height="205" rx="18" class="zone"/><text x="40" y="551" class="zt">3 · DETERMINISTIC AUTHORITY, HUMAN CONTROL, AND EVIDENCE</text>
+  <rect x="55" y="585" width="190" height="96" rx="13" class="node approval"/><text x="78" y="618" class="label">Lambda policy gate</text><text x="78" y="642" class="small">Safety · payment · contact</text><text x="78" y="661" class="small">Model cannot bypass</text>
+  <rect x="300" y="585" width="185" height="96" rx="13" class="node store"/><text x="323" y="618" class="label">DynamoDB</text><text x="323" y="642" class="small">Idempotent run state</text><text x="323" y="661" class="small">PITR · tasks · decisions</text>
+  <rect x="540" y="585" width="210" height="96" rx="13" class="node approval"/><text x="563" y="618" class="label">Step Functions + SNS</text><text x="563" y="642" class="small">Callback-token human wait</text><text x="563" y="661" class="small">Approve or reject</text>
+  <rect x="805" y="585" width="190" height="96" rx="13" class="node store"/><text x="828" y="618" class="label">S3 evidence</text><text x="828" y="642" class="small">SHA-256 canonical packet</text><text x="828" y="661" class="small">30-day lifecycle</text>
+  <rect x="1050" y="585" width="150" height="96" rx="13" class="node input"/><text x="1073" y="618" class="label">CloudWatch</text><text x="1073" y="642" class="small">Logs · metrics</text><text x="1073" y="661" class="small">X-Ray traces</text>
+  <rect x="1240" y="585" width="80" height="96" rx="13" class="node blocked"/><text x="1252" y="618" class="label">Hotel</text><text x="1252" y="642" class="small">external</text><text x="1252" y="661" class="small">BLOCKED</text>
+  <path d="M1100 456V520H150V585M245 633H300M485 633H540M750 633H805M995 633H1050" class="edge"/>
+  <path d="M645 681V712H1280V681" class="edge deny"/>
+  <text x="28" y="762" class="sub">Human approval resumes accountable internal workflow only. The competition deployment has zero PMS, payment, messaging, or guest-contact side effects.</text>
+</svg></main>

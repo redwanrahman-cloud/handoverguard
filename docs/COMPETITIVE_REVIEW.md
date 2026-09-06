@@ -51,12 +51,13 @@ Source: [official rules](https://agentsforhumans.devpost.com/rules)
 3. **Impact evidence:** avoid invented claims. Add a clearly labeled synthetic comparison of
    manual notes versus canonical tasks, and seek one short practitioner validation quote if
    available.
-4. **AWS depth:** AgentCore deployment would improve technical scoring, but only after the
-   required submission assets are complete.
+4. **AWS depth:** resolved. The public vertical slice now uses AgentCore Runtime, AgentCore
+   Gateway, Bedrock Guardrails, Nova Lite, Step Functions, DynamoDB, S3, EventBridge, SQS, SNS,
+   API Gateway, CloudFront, and CloudWatch/X-Ray.
 5. **Bonus:** publish up to three concise builder.aws build-journey posts if time remains.
 
 ## Current verdict
 
-The product is technically credible and differentiated, but it is **not submission-complete**
-until the public repository and video exist. The next best engineering investment is a stable
-public demo, not more speculative features.
+The product is technically credible, differentiated, and publicly testable, but it is **not
+submission-complete** until the repository is public and the required video exists. The next
+best investment is presentation evidence—not more speculative features.
