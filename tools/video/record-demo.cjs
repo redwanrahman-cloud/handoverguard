@@ -1,4 +1,6 @@
 const path = require('node:path');
+const { once } = require('node:events');
+const { spawn } = require('node:child_process');
 const { chromium } = require('/home/redwan/.openclaw/runtime-2026.9.2/node_modules/playwright-core');
 
 const root = path.resolve(__dirname, '../..');
@@ -7,8 +9,47 @@ const stageUrl = `file://${path.join(__dirname, 'stage.html')}`;
 const chromiumPath = '/home/redwan/.cache/ms-playwright/chromium-1234/chrome-linux64/chrome';
 const browserLibraries = path.join(root, 'dist/video/browser-libs/usr/lib/x86_64-linux-gnu');
 const smokeOnly = process.env.HG_RECORD_SMOKE === '1';
+const highQuality = process.env.HG_RECORD_HQ === '1';
+const hqOutput = path.join(root, 'dist/video/raw/handoverguard-hq-1080p.mp4');
 
 const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+
+async function startHighQualityCapture(page) {
+  const fps = 15;
+  const ffmpeg = spawn('/home/redwan/.local/bin/ffmpeg', [
+    '-y', '-hide_banner', '-loglevel', 'warning',
+    '-f', 'image2pipe', '-framerate', String(fps), '-vcodec', 'mjpeg', '-i', 'pipe:0',
+    '-an', '-c:v', 'libx264', '-preset', 'slow', '-crf', '15',
+    '-pix_fmt', 'yuv420p', '-movflags', '+faststart', hqOutput,
+  ], { stdio: ['pipe', 'inherit', 'inherit'] });
+  let running = true;
+  let lastFrame;
+  let written = 0;
+  const startedAt = Date.now();
+  const writeFrame = async (frame) => {
+    if (!ffmpeg.stdin.write(frame)) await once(ffmpeg.stdin, 'drain');
+    written += 1;
+  };
+  const loop = (async () => {
+    while (running) {
+      const frame = await page.screenshot({ type: 'jpeg', quality: 95 });
+      const target = Math.floor(((Date.now() - startedAt) / 1000) * fps);
+      while (lastFrame && written < target) await writeFrame(lastFrame);
+      await writeFrame(frame);
+      lastFrame = frame;
+    }
+  })();
+  return async (durationSeconds) => {
+    running = false;
+    await loop;
+    const targetFrames = Math.ceil(durationSeconds * fps);
+    while (lastFrame && written < targetFrames) await writeFrame(lastFrame);
+    ffmpeg.stdin.end();
+    const [code] = await once(ffmpeg, 'close');
+    if (code !== 0) throw new Error(`High-quality ffmpeg capture exited ${code}`);
+    return hqOutput;
+  };
+}
 
 (async () => {
   const browser = await chromium.launch({
@@ -20,18 +61,20 @@ const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
       LD_LIBRARY_PATH: `${browserLibraries}:${process.env.LD_LIBRARY_PATH || ''}`,
     },
   });
-  const context = await browser.newContext({
+  const contextOptions = {
     viewport: { width: 1920, height: 1080 },
     deviceScaleFactor: 1,
-    recordVideo: { dir: videoDir, size: { width: 1920, height: 1080 } },
-  });
+  };
+  if (!highQuality) contextOptions.recordVideo = { dir: videoDir, size: { width: 1920, height: 1080 } };
+  const context = await browser.newContext(contextOptions);
   const page = await context.newPage();
-  const video = page.video();
+  const video = highQuality ? undefined : page.video();
   await page.goto(stageUrl, { waitUntil: 'load' });
   const frame = page.frames().find((candidate) => candidate.url().includes('cloudfront.net'));
   if (!frame) throw new Error('Public demo iframe did not load');
   await frame.locator('#run').waitFor({ state: 'visible' });
 
+  const stopHighQualityCapture = highQuality ? await startHighQualityCapture(page) : undefined;
   const start = Date.now();
   const at = async (seconds, action) => {
     const remaining = start + seconds * 1000 - Date.now();
@@ -129,7 +172,9 @@ const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
   });
   await at(263, async () => {});
 
+  const output = stopHighQualityCapture ? await stopHighQualityCapture(264.2) : undefined;
+
   await context.close();
   await browser.close();
-  console.log(await video.path());
+  console.log(output || await video.path());
 })().catch((error) => { console.error(error); process.exitCode = 1; });
