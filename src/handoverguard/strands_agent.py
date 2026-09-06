@@ -17,6 +17,8 @@ Use tools to process the specified synthetic shift. Perform routine internal wor
 Never claim an external message, payment, compensation, safety resolution, or guest contact
 occurred.
 Those actions require a human approval request enforced by the tools. Never mark issues resolved.
+For a complete shift, call process_entire_shift exactly once so every issue is handled by the
+server-side workflow. Do not stop after triaging only one issue.
 Finish with a factual shift summary derived only from tool results.
 """
 
@@ -52,6 +54,18 @@ def build_tools(service: HandoverService) -> list[Any]:
         return service.triage(issue_id).model_dump(mode="json")
 
     @tool
+    def process_entire_shift(shift_id: str) -> list[dict[str, Any]]:
+        """Process every issue in a synthetic shift through the policy workflow.
+
+        This is the preferred tool for a complete handover because the server guarantees that
+        no issue is skipped and that repeated calls are idempotent.
+
+        Args:
+            shift_id: Synthetic shift identifier beginning with SHIFT-.
+        """
+        return [result.model_dump(mode="json") for result in service.process_shift(shift_id)]
+
+    @tool
     def generate_shift_handover(shift_id: str) -> dict[str, Any]:
         """Generate the current factual handover for a synthetic shift.
 
@@ -69,6 +83,7 @@ def build_tools(service: HandoverService) -> list[Any]:
         ingest_synthetic_issue,
         list_shift_issues,
         triage_issue,
+        process_entire_shift,
         generate_shift_handover,
         verify_audit_chain,
     ]
@@ -94,8 +109,8 @@ def run_shift_agent(service: HandoverService, shift_id: str) -> str:
     """Run one live Bedrock-backed Strands cycle."""
     agent = build_agent(service)
     result = agent(
-        f"Process every unprocessed issue for {shift_id}. Then verify the audit chain and "
-        "generate the handover. Return a concise operational summary."
+        f"Call process_entire_shift exactly once for {shift_id}. Then verify the audit chain, "
+        "generate the handover, and return a concise operational summary."
     )
     return str(result)
 

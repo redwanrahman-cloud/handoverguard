@@ -75,6 +75,7 @@ AWS_REGION=us-east-1 handoverguard-live-proof --json
 The command seeds only synthetic notes, lets the Strands agent call policy-bound tools, and
 then independently verifies the resulting task count, approval gates, zero external execution,
 and audit-chain integrity. It exits non-zero if any safety invariant fails.
+See [`docs/LIVE_BEDROCK_PROOF.md`](docs/LIVE_BEDROCK_PROOF.md) for the verified AWS run.
 
 ## AI-assisted development disclosure
 

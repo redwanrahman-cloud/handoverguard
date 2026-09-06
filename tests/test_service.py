@@ -42,6 +42,21 @@ def test_processing_is_idempotent() -> None:
     assert second.outcome == "task_already_exists"
 
 
+def test_complete_shift_processing_never_skips_an_issue() -> None:
+    app = service()
+    for issue in demo_issues():
+        app.ingest(issue)
+
+    first = app.process_shift(DEMO_SHIFT_ID)
+    second = app.process_shift(DEMO_SHIFT_ID)
+
+    assert len(first) == 5
+    assert len(second) == 5
+    assert len(app.handover(DEMO_SHIFT_ID).tasks) == 2
+    assert len(app.repository.list_approvals(DEMO_SHIFT_ID)) == 2
+    assert app.repository.verify_audit_chain()
+
+
 def test_safety_never_creates_an_automatic_task() -> None:
     app = service()
     safety = app.ingest(demo_issues()[-1])

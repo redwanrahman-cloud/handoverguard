@@ -94,7 +94,7 @@ JavaScript, HTML, and CSS.
 - [x] Deterministic judge proof
 - [x] Human approval/rejection loop
 - [x] Live Strands + Bedrock proof command
-- [ ] Capture a passing live-proof artifact from an authenticated local AWS session
+- [x] Capture a passing live-proof artifact from authenticated AWS CloudShell
 - [ ] Record and upload the three-minute demo video
 - [ ] Add final screenshots and thumbnail
 - [ ] Make the GitHub repository public before submission
