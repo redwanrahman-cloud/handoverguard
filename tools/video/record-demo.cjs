@@ -16,33 +16,44 @@ const hqOutput = path.join(root, `dist/video/raw/${motionTest ? 'handoverguard-m
 const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
 async function startHighQualityCapture(page) {
-  const fps = 20;
+  const fps = 30;
   const ffmpeg = spawn('/home/redwan/.local/bin/ffmpeg', [
     '-y', '-hide_banner', '-loglevel', 'warning',
     '-f', 'image2pipe', '-framerate', String(fps), '-vcodec', 'mjpeg', '-i', 'pipe:0',
     '-an', '-c:v', 'libx264', '-preset', 'slow', '-crf', '15',
     '-pix_fmt', 'yuv420p', '-movflags', '+faststart', hqOutput,
   ], { stdio: ['pipe', 'inherit', 'inherit'] });
+  const cdp = await page.context().newCDPSession(page);
   let running = true;
   let lastFrame;
   let written = 0;
+  let writeQueue = Promise.resolve();
   const startedAt = Date.now();
   const writeFrame = async (frame) => {
     if (!ffmpeg.stdin.write(frame)) await once(ffmpeg.stdin, 'drain');
     written += 1;
   };
-  const loop = (async () => {
-    while (running) {
-      const frame = await page.screenshot({ type: 'jpeg', quality: 95 });
+  cdp.on('Page.screencastFrame', ({ data, sessionId }) => {
+    const frame = Buffer.from(data, 'base64');
+    writeQueue = writeQueue.then(async () => {
+      if (!running) return;
       const target = Math.floor(((Date.now() - startedAt) / 1000) * fps);
       while (lastFrame && written < target) await writeFrame(lastFrame);
-      await writeFrame(frame);
+      if (written <= target) await writeFrame(frame);
       lastFrame = frame;
-    }
-  })();
+    }).finally(() => cdp.send('Page.screencastFrameAck', { sessionId }).catch(() => {}));
+  });
+  await cdp.send('Page.startScreencast', {
+    format: 'jpeg',
+    quality: 95,
+    maxWidth: 1920,
+    maxHeight: 1080,
+    everyNthFrame: 1,
+  });
   return async (durationSeconds) => {
     running = false;
-    await loop;
+    await cdp.send('Page.stopScreencast');
+    await writeQueue;
     const targetFrames = Math.ceil(durationSeconds * fps);
     while (lastFrame && written < targetFrames) await writeFrame(lastFrame);
     ffmpeg.stdin.end();
