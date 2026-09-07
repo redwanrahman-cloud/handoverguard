@@ -29,12 +29,13 @@ extracts canonical issues; deterministic policy creates routine internal work wh
 financial, compensation, and guest-contact actions become Step Functions approval waits. A judge
 can approve or reject them in the public console and watch the managed service trace update.
 
-The competition scenario demonstrates five notes:
+The competition scenario demonstrates five raw notes:
 
-- two reports of the same room maintenance issue, linked as one canonical issue;
-- a late-arrival welcome pack, converted into a safe internal task;
-- a compensation request, held for human approval;
-- a fire-door obstruction, escalated and held for human judgment.
+- two Arabic and English reports of the same electrical burning smell, merged into one canonical
+  safety incident;
+- a towel request, converted into a safe internal task;
+- a SAR 250 room charge, held for financial approval;
+- a prompt-injection instruction that is ignored and never becomes an action.
 
 Approval does not silently contact a guest, move money, or close an incident. It creates an
 owned follow-up task. Rejection leaves the proposed action blocked.
