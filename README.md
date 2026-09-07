@@ -1,5 +1,8 @@
 # HandoverGuard
 
+**[Live AWS demo](https://d1234urv6397y8.cloudfront.net)** ·
+**[4:24 judge video](https://youtu.be/gr7awofIHmw)**
+
 HandoverGuard is a policy-bound AI agent for hotel shift handovers. It turns noisy
 operational notes into owned follow-up work, while holding safety, guest compensation,
 payments, and external communications for explicit human approval.

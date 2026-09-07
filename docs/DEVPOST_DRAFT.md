@@ -4,6 +4,12 @@
 
 HandoverGuard
 
+## Public links
+
+- Demo video: **https://youtu.be/gr7awofIHmw**
+- Live AWS demo: **https://d1234urv6397y8.cloudfront.net**
+- Source code: **https://github.com/redwanrahman-cloud/handoverguard**
+
 ## Tagline
 
 A policy-bound Strands agent that turns noisy hotel shift notes into owned work—and pauses
@@ -118,7 +124,8 @@ JavaScript, HTML, and CSS.
 - [x] Add downloadable judge evidence packet
 - [x] Deploy a public AWS-native judge console
 - [x] Complete a real end-to-end AgentCore/Nova/Gateway/Step Functions run
-- [ ] Record and upload the 4:25 judge-facing demo video using `docs/DEMO_VIDEO_SCRIPT.md`
+- [x] Record the 4:24 judge-facing demo video using `docs/DEMO_VIDEO_SCRIPT.md`
+- [x] Upload the approved master to YouTube and make it public
 - [ ] Add final screenshots and thumbnail
-- [ ] Make the GitHub repository public before submission
+- [x] Make the GitHub repository public before submission
 - [ ] Fill all remaining Devpost fields and submit
